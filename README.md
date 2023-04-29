@@ -12,6 +12,6 @@ zsh file manager
 ```
 
 ## TODO
-- [ ] basic navigation
+- [x] basic navigation
 - [ ] add, open, delete, rename files
 - [ ] status line
