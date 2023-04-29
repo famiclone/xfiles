@@ -1,65 +1,127 @@
 #!/usr/bin/env zsh
 
 autoload -U colors && colors
-for COLOR in RED GREEN YELLOW BLUE MAGENTA CYAN BLACK WHITE; do
-    eval $COLOR='%{$fg_no_bold[${(L)COLOR}]%}'  #wrap colours between %{ %} to avoid weird gaps in autocomplete
-    eval BOLD_$COLOR='%{$fg_bold[${(L)COLOR}]%}'
-done
-eval RESET='%{$reset_color%}'
 
-function get_current_dir_path() {
-  print $PWD
+parent_cursor_pos=0
+cursor_pos=0
+cursor_type=">"
+editor="vim"
+
+function render_dir() {
+  local files
+  local dirs
+
+  [[ $PWD == / ]] && PWD=
+
+  for item in $PWD/*; do
+    if [[ -d $item ]]; then
+      dirs+=("$item")
+    else
+      files+=("$item")
+    fi
+  done
+
+
+  items=("${dirs[@]}""${files[@]}")
+
+  for ((i = 0; i < "${#items[@]}"; ++i)); do
+    local item=${items[$i]}
+    if [[ -d "${item}" ]]; then
+      if [[ $cursor_pos == $i ]]; then
+        echo "$bg[cyan]$fg_bold[black]${item}$reset_color"
+      else
+        echo "$fg_bold[cyan]${item}$reset_color"
+      fi
+    else
+      if [[ $cursor_pos == $i ]]; then
+        print "$bg[white]$fg[black]${item}$reset_color"
+      else
+        print "$fg[white]$item$reset_color"
+      fi
+    fi
+  done
 }
 
-function get_current_dir_name() {
-  print $(basename $PWD) 
+function change_dir() {
+  cd $1
+}
+
+function render_statusbar() {
+
+  # Save cursor position
+  echo -n '\033[s'
+  # Move cursor to last line
+  echo -n '\033[999B'
+  # Clear line
+  echo -n '\033[2K'
+
+  print -P -- "%{$bg[green]%}%{$fg_bold[black]%}  $cursor_pos  "
+
+  # Restore cursor position
+  echo -n '\033[u'
+}
+
+function clear() {
+  echo -e "\033c" # clear
+}
+
+function render() {
+  clear
+
+  render_dir
+  render_statusbar
 }
 
 function main() {
-  cd $PWD
 
-  _X_FILES=$(print -l -- *(D.)) 2> /dev/null
-  _X_DIRS="${BOLD_CYAN}$(print -l -- *(D/))${RESET}" 2> /dev/null
+  #change_dir "$PWD"
 
-  X_FILES=($_X_FILES)
-  X_DIRS=($_X_DIRS)
-
-  X_DIR_NAME=$(get_current_dir_name)
-  X_DIR_PATH=$(get_current_dir_path)
-
-
-  for dir in "${X_DIRS[@]}"
-  do
-    echo "$dir"
-  done
-
-  for file in "${X_FILES[@]}"
-  do
-    echo "$file"
-  done
-
-
-  # Turn off echo flag for terminal
-  stty -echo
+  stty -echo # Turn off echo flag for terminal
+  echo -ne "\e[?25l" # hide cursor
 
   while true; do
-    read -k1 input
-    if [[ $input == "q" ]]; then
+    render
+
+    local item="${items[$cursor_pos]}"
+
+    read -k1 key
+
+    if [[ $key == "q" ]]; then
+      clear
       break
     fi
 
-    if [[ $input == "h" ]]; then
+    if [[ $key == "h" ]]; then
+      cursor_pos=$parent_cursor_pos
+      parent_cursor_pos=0
+      change_dir "$(dirname $PWD)"
     fi
 
-    if [[ $input == "j" ]]; then
+    if [[ $key == "j" ]]; then
+      ((cursor_pos++ ))
     fi
 
-    if [[ $input == "k" ]]; then
+    if [[ $key == "k" ]]; then
+      if [[ $cursor_pos -gt 0 ]]; then
+        ((cursor_pos-- ))
+      fi
     fi
 
-    if [[ $input == "l" ]]; then
+    if [[ $key == "l" ]]; then
+      if [[ -d $item ]]; then
+        if ! [[ -z $item ]]; then
+          parent_cursor_pos=$cursor_pos
+          cursor_pos=0
+          change_dir $item
+        fi
+      else
+        $editor $item
+      fi
     fi
+
   done
+  
+  tput cnorm
 }
 
 main
