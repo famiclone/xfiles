@@ -1,0 +1,65 @@
+#!/usr/bin/env zsh
+
+autoload -U colors && colors
+for COLOR in RED GREEN YELLOW BLUE MAGENTA CYAN BLACK WHITE; do
+    eval $COLOR='%{$fg_no_bold[${(L)COLOR}]%}'  #wrap colours between %{ %} to avoid weird gaps in autocomplete
+    eval BOLD_$COLOR='%{$fg_bold[${(L)COLOR}]%}'
+done
+eval RESET='%{$reset_color%}'
+
+function get_current_dir_path() {
+  print $PWD
+}
+
+function get_current_dir_name() {
+  print $(basename $PWD) 
+}
+
+function main() {
+  cd $PWD
+
+  _X_FILES=$(print -l -- *(D.)) 2> /dev/null
+  _X_DIRS="${BOLD_CYAN}$(print -l -- *(D/))${RESET}" 2> /dev/null
+
+  X_FILES=($_X_FILES)
+  X_DIRS=($_X_DIRS)
+
+  X_DIR_NAME=$(get_current_dir_name)
+  X_DIR_PATH=$(get_current_dir_path)
+
+
+  for dir in "${X_DIRS[@]}"
+  do
+    echo "$dir"
+  done
+
+  for file in "${X_FILES[@]}"
+  do
+    echo "$file"
+  done
+
+
+  # Turn off echo flag for terminal
+  stty -echo
+
+  while true; do
+    read -k1 input
+    if [[ $input == "q" ]]; then
+      break
+    fi
+
+    if [[ $input == "h" ]]; then
+    fi
+
+    if [[ $input == "j" ]]; then
+    fi
+
+    if [[ $input == "k" ]]; then
+    fi
+
+    if [[ $input == "l" ]]; then
+    fi
+  done
+}
+
+main

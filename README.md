@@ -1,0 +1,2 @@
+# xfiles 🛸
+zsh file manager
