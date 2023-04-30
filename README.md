@@ -21,7 +21,7 @@ Commands:
 
 ## Install
 ```
-zsh <(curl -s https://raw.githubusercontent.com/famiclone/xfiles/main/install.zsh)
+zsh <(curl -s https://raw.githubusercontent.com/famiclone/xfiles/main/install.sh)
 ```
 
 ## TODO
