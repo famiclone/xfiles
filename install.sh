@@ -22,7 +22,7 @@ main() {
   git clone --depth 1 -b $BRANCH https://github.com/famiclone/xfiles "$XFILES_DIR" > /dev/null || { print "Installation was failed!" }
 
   echo '# Added by xfiles file manager' >> "$ZSHRC"
-  echo '[ -f "$HOME/.local/share/xfiles/xfiles" ] && alias xfiles="$HOME/.local/share/xfiles/xfiles"' >> "$ZSHRC"
+  echo '[ -f "$HOME/.local/share/xfiles/xfiles" ] && source "$HOME/.local/share/xfiles/xfiles"' >> "$ZSHRC"
 
   print "xfiles installed!"
 
