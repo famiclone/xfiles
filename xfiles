@@ -72,7 +72,7 @@ function render() {
   render_statusbar
 }
 
-function main() {
+function _xfiles_run() {
 
   #change_dir "$PWD"
 
@@ -124,4 +124,43 @@ function main() {
   tput cnorm
 }
 
-main
+function _xfiles_help() {
+  print "
+  
+██╗  ██╗███████╗██╗██╗     ███████╗███████╗
+╚██╗██╔╝██╔════╝██║██║     ██╔════╝██╔════╝
+ ╚███╔╝ █████╗  ██║██║     █████╗  ███████╗
+ ██╔██╗ ██╔══╝  ██║██║     ██╔══╝  ╚════██║
+██╔╝ ██╗██║     ██║███████╗███████╗███████║
+╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝╚══════╝╚══════╝
+                                           
+
+Usage:
+  xfiles
+  xfiles <command>
+
+Commands:
+  xfiles help           Show help
+  xfiles upgrade        Show current and upgrade new version
+  xfiles uninstall      Uninstall
+"
+}
+
+function _xfiles_upgrade() {
+  print "not implemented"
+}
+
+function _xfiles_uninstall() {
+  print "not implemented"
+}
+
+function xfiles() {
+  typeset -A subcommands=(
+    help "_xfiles_help"
+    upgrade "_xfiles_upgrade"
+    uninstall "_xfiles_uninstall"
+  )
+
+  emulate -L zsh
+  [[ -z "$subcommands[$1]" ]] && { _xfiles_run "$@"; return 1 } || ${subcommands[$1]}
+}
