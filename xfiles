@@ -161,7 +161,7 @@ function _xfiles_upgrade() {
 
   if [[ $REMOTE_TAG > $LOCAL_TAG ]]; then
     print "New release is available. Upgrade..."
-    git clone --depth 1 --branch $REMOTE_TAG $REMOTE_REPO $LOCAL_PATH
+    git clone --depth 1 --branch $REMOTE_TAG $REMOTE_REPO $XFILES_DIR
 
     printf "xfiles was upgraded to version %s" $REMOTE_TAG
 
