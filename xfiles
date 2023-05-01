@@ -146,8 +146,28 @@ Commands:
 "
 }
 
+function _check_installed_version() {
+  print $(git tag | head -n1)
+}
+
 function _xfiles_upgrade() {
-  print "not implemented"
+  local REMOTE_REPO="https://github.com/famiclone/xfiles"
+  local XFILES_DIR="$HOME/.local/share/xfiles"
+
+  local LOCAL_TAG=$(_check_installed_version)
+  local REMOTE_TAG=$(git ls-remote --tags $REMOTE_REPO | awk '{print $2}' | grep -v '{}' | sort -r | head -n1 | sed 's#refs/tags/##')
+
+  printf "Current version %s\n" $LOCAL_TAG
+
+  if [[ $REMOTE_TAG > $LOCAL_TAG ]]; then
+    print "New release is available. Upgrade..."
+    git clone --depth 1 --branch $REMOTE_TAG $REMOTE_REPO $LOCAL_PATH
+
+    printf "xfiles was upgraded to version %s" $REMOTE_TAG
+
+  else
+    print "New version isn't available."
+  fi
 }
 
 function _xfiles_uninstall() {
