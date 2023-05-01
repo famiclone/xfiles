@@ -3,7 +3,6 @@
 main() {
   local XFILES_DIR="$HOME/.local/share/xfiles"
   local XFILES_CONFIG="$HOME/.config/xfiles"
-  local BRANCH="main"
 
   [[ -d "$XFILES_DIR" ]] && {
     print "Xfiles directory exists"
@@ -19,14 +18,14 @@ main() {
     print "xfilesrc file created!"
   }
   
-  git clone --depth 1 -b $BRANCH https://github.com/famiclone/xfiles "$XFILES_DIR" > /dev/null || { print "Installation was failed!" }
+  git clone --depth 1 --branch $(git describe --abbrev=0 --tags) https://github.com/famiclone/xfiles "$XFILES_DIR" > /dev/null || { print "Installation was failed!" }
 
   echo '# Added by xfiles file manager' >> "$ZSHRC"
   echo '[ -f "$HOME/.local/share/xfiles/xfiles" ] && source "$HOME/.local/share/xfiles/xfiles"' >> "$ZSHRC"
 
   source "$ZSHRC"
 
-  print "xfiles installed!"
+  printf "xfiles v%s installed!\n" $(git tag | head -n1)
 
   return 0
 }
