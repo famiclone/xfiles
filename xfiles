@@ -1,10 +1,11 @@
 #!/usr/bin/env zsh
 
+export XFILES_DIR="$HOME/.local/share/xfiles"
+
 autoload -U colors && colors
 
 parent_cursor_pos=0
 cursor_pos=0
-cursor_type=">"
 editor="vim"
 
 function render_dir() {
@@ -25,7 +26,7 @@ function render_dir() {
   items=("${dirs[@]}""${files[@]}")
 
   for ((i = 0; i < "${#items[@]}"; ++i)); do
-    local item=${items[$i]}
+    local item=$(basename "${items[$i]}")
     if [[ -d "${item}" ]]; then
       if [[ $cursor_pos == $i ]]; then
         echo "$bg[cyan]$fg_bold[black]${item}$reset_color"
@@ -46,6 +47,18 @@ function change_dir() {
   cd $1
 }
 
+function print_message() {
+  local $msg=$1
+
+  echo -n '\033[s'
+  echo -n '\033[999B'
+  echo -n '\033[2K'
+
+  echo $msg
+
+  echo -n '\033[u'
+}
+
 function render_statusbar() {
 
   # Save cursor position
@@ -59,6 +72,13 @@ function render_statusbar() {
 
   # Restore cursor position
   echo -n '\033[u'
+}
+
+function delete() {
+  local path=$1
+
+  print_message "Are your sure to delete $path?" &2>
+
 }
 
 function clear() {
@@ -90,6 +110,11 @@ function _xfiles_run() {
       clear
       break
     fi
+
+    if [[ $key == "d" ]]; then
+      delete $item
+    fi
+
 
     if [[ $key == "h" ]]; then
       cursor_pos=$parent_cursor_pos
@@ -152,7 +177,6 @@ function _xfiles_version() {
 
 function _xfiles_upgrade() {
   local REMOTE_REPO="https://github.com/famiclone/xfiles"
-  local XFILES_DIR="$HOME/.local/share/xfiles"
 
   local LOCAL_TAG=$(_xfiles_version)
   local REMOTE_TAG=$(git ls-remote --tags $REMOTE_REPO | awk '{print $2}' | grep -v '{}' | sort -r | head -n1 | sed 's#refs/tags/##')
