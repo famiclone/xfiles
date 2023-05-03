@@ -18,10 +18,10 @@ main() {
     print "xfilesrc file created!"
   }
   
-  git clone --depth 1 --branch $(git describe --abbrev=0 --tags) https://github.com/famiclone/xfiles "$XFILES_DIR" > /dev/null || { print "Installation was failed!" }
+  git clone --depth 1 --branch main https://github.com/famiclone/xfiles "$XFILES_DIR" > /dev/null || { print "Installation was failed!" }
 
-  echo '# Added by xfiles file manager' >> "$ZSHRC"
-  echo '[ -f "$HOME/.local/share/xfiles/xfiles" ] && source "$HOME/.local/share/xfiles/xfiles"' >> "$ZSHRC"
+  #echo '# Added by xfiles file manager' >> "$ZSHRC"
+  #echo '[ -f "$HOME/.local/share/xfiles/xfiles" ] && source "$HOME/.local/share/xfiles/xfiles"' >> "$ZSHRC"
 
   source "$ZSHRC"
 
